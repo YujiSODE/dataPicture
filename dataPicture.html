@@ -1,0 +1,167 @@
+<!--
+* dataPicture
+* dataPicture.html
+*===================================================================
+*	Copyright (c) 2018 Yuji SODE <yuji.sode@gmail.com>
+*
+*	This software is released under the MIT License.
+*	See LICENSE or http://opensource.org/licenses/mit-license.php
+*===================================================================
+*/
+-->
+<!-- A tool that generates image from various formatted data. -->
+<!DOCTYPE html><html lang='en'>
+	<head>
+		<meta charset='utf-8'>
+		<meta name='description' content="A tool that generates image from various formatted data.">
+		<title>dataMappingGuide_web</title>
+		<style type='text/css'>
+			canvas{
+				border:1px solid #000f;
+			}
+			#formDiv{
+				position:fixed;
+				right:0;
+				top:5vh;
+				width:45vw;
+				height:40vh;
+				resize:both;
+				background:#ddd;
+				overflow:scroll;
+			}
+			.divRight{
+				right:0;
+			}
+			.divLeft{
+				left:0;
+			}
+			img{
+				border:1px solid #f00f;
+			}
+		</style>
+		<script type='text/javascript' src='./hexFromDataurl_min.js'></script>
+		<script type='text/javascript' src='./capturingCanvas_min.js'></script>
+		<script type='text/javascript' src='./hexMap2Canvas_min.js'></script>
+	</head>
+	<body>
+		<div>
+			<h1>dataPicture</h1>
+			<p>A tool that generates image from various formatted data.</p>
+		</div>
+		<canvas id='cvs_dataMappingGuide' width=100 height=100></canvas>
+		<div id='formDiv' class='divRight'>
+			<form id='control'>
+				<!-- sizes, background and divisions of canvas -->
+				<fieldset id='CANVAS'>
+					<legend><b>Canvas</b></legend>
+					<label>Source<input type='file' id='srcFile'></label>
+					<div id='canvasSizes'>
+						<label>Width<input type='number' id='inputWidth' value=100 min=100 step=50 required></label>
+						<label>Height<input type='number' id='inputHeight' value=100 min=100 step=50 required></label>
+					</div>
+				</fieldset>
+				<!-- random seed -->
+				<fieldset id='RANDOM_SEED'>
+					<legend><b>Random seed</b></legend>
+					<div id='rdSeedInput'>
+						<label>Seed value<input type='number' id='inputRSeed' value=10 min=0 max=99999999999999 step=1 required></label>
+						<button id='changeSeedB' type='button'>Change seed value</button>
+					</div>
+				</fieldset>
+				<!-- download area -->
+				<fieldset id='DOWNLOAD'>
+					<legend><b>Download</b></legend>
+					<details id='downloadArea'>
+						<summary>Download list</summary>
+					</details>
+				</fieldset>
+			</form>
+			<button id='leftB'>Left</button>
+			<button id='rightB'>Right</button>
+			<button id='captureB'>Capture Image</button>
+		</div>
+		<footer>
+			<p>Copyright (c) 2018 Yuji SODE</p>
+			<a href='https://github.com/YujiSODE'>GitHub</a>
+		</footer>
+	<script type='text/javascript'>
+		(function(){
+			var slf=window,C=slf.document.getElementById('cvs_dataMappingGuide'),reader=new FileReader(),
+				/*buttons*/
+				ChangeSeedB=slf.document.getElementById('changeSeedB'),
+				LeftB=slf.document.getElementById('leftB'),
+				RightB=slf.document.getElementById('rightB'),
+				CaptureB=slf.document.getElementById('captureB'),
+				/*form inputs: Canvas*/
+				srcF=slf.document.getElementById('srcFile'),
+				srcLength=0,
+				width=slf.document.getElementById('inputWidth'),
+				height=slf.document.getElementById('inputHeight'),
+				/*form inputs: Random seed*/
+				sd=slf.document.getElementById('inputRSeed'),
+				/*function to capture canvas image*/
+				captureImg=capturingCanvas(C,slf.document.getElementById('downloadArea'));
+			//### initial values ###
+			sd.value=Math.floor(Math.random()*1000);
+			//### file reader event ###
+			reader.addEventListener('load',function(){
+				var SD=sd.value>99999999999999?99999999999999:sd.value;
+				hexMap2Canvas(C,hexFromDataurl(reader.result,C.width,C.height-1,SD));
+			},false);
+			//### form change event ###
+			slf.document.getElementById('control').addEventListener('change',function(){
+				var ctx=C.getContext('2d'),w=50,h=100;
+				C.width=width.value,C.height=height.value;
+				ctx.fillStyle="#fff",ctx.clearRect(0,0,C.width,C.height),ctx.fillRect(0,0,C.width,C.height);
+				ctx=null;
+				srcF=slf.document.getElementById('srcFile');
+				srcLength=srcF.files.length;
+				if(srcLength>0){
+					reader.readAsDataURL(srcF.files[0]);
+				}
+			},false);
+			//### button event ###
+			ChangeSeedB.addEventListener('click',function(){
+				//change event
+				var changeEvent=new Event('change');
+				sd.value=Math.floor(Math.random()*1000);
+				slf.document.getElementById('control').dispatchEvent(changeEvent);
+				changeEvent=null;
+			},false);
+			LeftB.addEventListener('click',function(){
+				slf.document.getElementById('formDiv').className='divLeft';
+			},false);
+			RightB.addEventListener('click',function(){
+				slf.document.getElementById('formDiv').className='divRight';
+			},false);
+			CaptureB.addEventListener('click',function(){
+				captureImg();
+			},false);
+		}());
+	</script>
+	</body>
+</html>
+<!-- dataPicture.html -->
+<!--/*
+*          MIT License
+*
+* Copyright (c) 2018 Yuji Sode
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+*/-->

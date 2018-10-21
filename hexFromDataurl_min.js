@@ -1,0 +1,3 @@
+//=== hexFromDataurl/hexFromDataurl.js (Yuji SODE,2018): the MIT License; https://gist.github.com/YujiSODE/3189880e32ffdaeee3307ea0565eab0e ===
+//It generates hexadecimal sequence from a dataurl with Base64 encoded data
+function hexFromDataurl(dataurl,W,H,sd){W=Math.floor(Math.abs(W)),H=Math.floor(Math.abs(H)),sd=Math.floor(Math.abs(sd));var slf=window,sd_3=sd>99999999999999?(99999999999999).toString(3):sd.toString(3),sdL=sd_3.length,buffer='',i=0,v='',L=0,seq='';v=window.atob(dataurl.replace(/data\:[^/]+\/[^/]+\;base64\,/,'')).replace(/\s/g,'');L=v.length;while(i<L){buffer=(+v.codePointAt(i)).toString(16)[sd_3[i%sdL]];seq+=i>0?(i%W>0?'':'\n'):'';seq+=!buffer?0:buffer;i+=1;i=i>(W*H-1)?L:i;}return seq;}
